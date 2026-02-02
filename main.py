@@ -1,9 +1,8 @@
 from mcp.server.fastmcp import FastMCP
-import directory_operations
+from tools import host_operations
 
-mcp = FastMCP("directory_operations_mcp")
-mcp.add_tool(directory_operations.get_current_files)
-mcp.add_tool(directory_operations.get_file_content)
+mcp = FastMCP("host_operations_mcp")
+mcp.add_tool(host_operations.get_host_info)
 
 if __name__ == "__main__":
     mcp.run("stdio")
