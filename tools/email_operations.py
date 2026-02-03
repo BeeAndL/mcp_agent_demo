@@ -11,8 +11,7 @@ def get_email_address_by_username(username: str) -> str:
     Returns:
         the email address of the user
     """
-    print(f"Getting email address for {username}")
-    return f"{username}@shopee.com"
+    return f"Email address for {username} is {username}@shopee.com"
 
 
 def send_email(recipient_email: str, body: str) -> tuple[bool, str]:
@@ -24,4 +23,4 @@ def send_email(recipient_email: str, body: str) -> tuple[bool, str]:
     Returns:
         True if the email is sent successfully, False otherwise
     """
-    return True, f"Sending email to {recipient_email} with body: {body}"
+    return True, f"Successfully sent email to {recipient_email} with body: {body}"

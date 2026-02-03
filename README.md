@@ -23,7 +23,7 @@ pip install -r requirements.txt
 以 stdio 方式启动 MCP 服务（供 Cursor 等客户端连接）：
 
 ```bash
-python main.py
+python main_mcp.py
 ```
 
 ## 项目结构
