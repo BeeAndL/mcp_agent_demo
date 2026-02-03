@@ -23,4 +23,4 @@ def send_email(recipient_email: str, body: str) -> tuple[bool, str]:
     Returns:
         True if the email is sent successfully, False otherwise
     """
-    return True, f"Successfully sent email to {recipient_email} with body: {body}"
+    return f"Successfully sent email to {recipient_email} with body: {body}"

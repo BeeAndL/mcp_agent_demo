@@ -8,38 +8,41 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-# step 1: handle the user input
+tool_declaration = {
+    "type": "function",
+    "function": {
+        "name": "get_email_address_by_username",
+        "description": "get the email address of the username",
+        "parameters": {"type": "object", "properties": {"username": {"type": "string", "description": "the username of the user"}}}
+    }
+}
+
+payload = {
+    "model": "deepseek-v3-2-251201",
+    "stream": False,
+    "messages": [],
+    "tools": [tool_declaration]
+}
+
+# step 1: LLM handles the user input
 messages = input(">>> User: ")
-function = {
-    "name": "get_email_address_by_username",
-    "description": "get the email address of the username",
-    "parameters": {"type": "object", "properties": {"username": {"type": "string", "description": "the username of the user"}}}
-}
-payload = {
-    "model": "doubao-seed-1-8-251228",
-    "stream": False,
-    "messages": [{"role": "user", "content": messages}],
-    "tools": [{"type": "function", "function": function}],
-    "tool_choice": "auto"
-}
+payload["messages"] = [{"role": "user", "content": messages}]
 response = requests.request("POST", url, headers=headers, json=payload)
-print(f"response.text: {response.text}")
+tool_calls = response.json()["choices"][0]["message"]["tool_calls"]
+tool_call_id = tool_calls[0]["id"]
+assistant_response = response.json()["choices"][0]["message"]["content"]
+print(f"<<< raw response: {response.json()}")
 
-# step 2: handle the response
-func_response = ""
+# step 2: call the function
+tool_response = ""
 if "get_email_address_by_username" in response.text:
-    func_response = email_operations.get_email_address_by_username("yaohua.li")
-    print(f"response of calling get_email_address_by_username: {func_response}")
+    tool_response = email_operations.get_email_address_by_username("yaohua.li")
+print(f"<<< tool_response: {tool_response}")
 
-# step 3: add the function response to the messages
-messages += func_response
-payload = {
-    "model": "doubao-seed-1-8-251228",
-    "stream": False,
-    "messages": [{"role": "user", "content": messages}],
-    "tools": [{"type": "function", "function": {"name": "get_email_address_by_username",
-                                                "description": "get the email address of the username"}}],
-    "tool_choice": "auto"
-}
+# step 3: return the function response to the LLM
+payload["messages"] = [{"role": "user", "content": messages},
+                       {"role": "assistant", "content": assistant_response, "tool_calls": tool_calls},
+                       {"role": "tool", "content": tool_response, "tool_call_id": tool_call_id}]
 response = requests.request("POST", url, headers=headers, json=payload)
-print(f"response.text: {response.text}")
+final_response = response.json()["choices"][0]["message"]["content"]
+print(f"<<< final_response: {final_response}")
